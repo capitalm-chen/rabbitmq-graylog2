@@ -1,0 +1,49 @@
+version: "2"
+services:
+  mq:
+    image: rabbitmq:3-management
+    hostname: rabbit
+    volumes:
+      - ./mq/enabled_plugins:/etc/rabbitmq/enabled_plugins:ro
+    volumes_from:
+      - persistent:rw
+    environment:
+      - RABBITMQ_DEFAULT_USER=mq-admin
+      - RABBITMQ_DEFAULT_PASS=mq-password
+      - RABBITMQ_NODENAME=mq
+    ports:
+      - 15672:15672 # admin
+      - 5672:5672 # AMQP
+      - 1883:1883 # MQTT
+      - 61613:61613 # Stomp
+      - 15674:15674 # Web-Stomp
+  mongo:
+    image: mongo:3
+    volumes_from:
+      - persistent:rw
+  elasticsearch:
+    image: elasticsearch:2
+    command: ["elasticsearch", "-Des.cluster.name=graylog"]
+  graylog:
+    image: graylog2/server:2.1.1-1
+    environment:
+      GRAYLOG_PASSWORD_SECRET: graylog-pepper-top-secret
+      GRAYLOG_ROOT_PASSWORD_SHA2: eebf10479ee54fa113b625ddcd52f25e8f937d3cfd9cae2360593c71712b5c6f # graylog-password
+      GRAYLOG_WEB_ENDPOINT_URI: http://127.0.0.1:9000/api
+    links:
+      - mongo
+      - elasticsearch
+      - mq
+    ports:
+      - 9000:9000
+      - 12201/udp:12201/udp
+      - 1514/udp:1514/udp
+  persistent:
+      image: debian:jessie
+      volumes:
+        - /var/lib/rabbitmq
+        - /data/db # mongodb
+        - /usr/share/elasticsearch/data # elastisearch
+        - /usr/share/graylog/data/journal # graylog
+        - /usr/share/graylog/data/config # graylog
+      command: /bin/true
