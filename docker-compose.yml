@@ -5,6 +5,7 @@ services:
     hostname: rabbit
     volumes:
       - ./mq/enabled_plugins:/etc/rabbitmq/enabled_plugins:ro
+      - ./mq/configure.sh:/configure.sh:ro
     volumes_from:
       - persistent:rw
     environment:

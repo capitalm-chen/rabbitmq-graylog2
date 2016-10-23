@@ -1,0 +1,1 @@
+{"vhost":"/","name":"log-messages","type":"fanout","durable":"true","auto_delete":"false","internal":"false","arguments":{}}
