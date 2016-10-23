@@ -12,3 +12,5 @@ echo "Creating exchange: log-messages"
 curl -o /dev/null -X PUT -H 'Content-Type: application/json' \
        -d "`cat $SCRIPT_ROOT/mq/log-messages`" \
        'http://mq-admin:mq-password@localhost:15672/api/exchanges/%2F/log-messages'
+
+python "$SCRIPT_ROOT/graylog2/configure.py"
