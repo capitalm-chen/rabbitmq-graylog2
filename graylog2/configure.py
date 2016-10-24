@@ -36,6 +36,16 @@ class GraylogConfigure(object):
             return None
         return response['nodes'][0]['node_id']
 
+    def setup_input(self):
+        input_ = self.get_input()
+        if input_:
+            return input_
+        node_id = self.get_node_id()
+        if not node_id:
+            raise('Error getting node ID')
+        self.add_input(node_id)
+        return self.get_input()
+
     def get_input(self):
         response = self.get('/api/system/inputs')
         for input in response['inputs']:
@@ -71,12 +81,43 @@ class GraylogConfigure(object):
         }
         self.post('/api/system/inputs', data)
 
+    def setup_extractor(self, input_id):
+        if not self.get_extractor(input_id):
+            self.add_extractor(input_id)
+
+    def get_extractor(self, input_id):
+        url = '/api/system/inputs/%s/extractors' % (input_id,)
+        response = self.get(url)
+        for entry in response['extractors']:
+            if entry['title'] == 'json':
+                return entry
+        return None
+
+    def add_extractor(self, input_id):
+        data = {
+            'title': 'json',
+            'cut_or_copy': 'copy',
+            'source_field': 'message',
+            'target_field': '',
+            'extractor_type': 'json',
+            'extractor_config': {
+                'list_separator': ', ',
+                'key_separator': '.',
+                'kv_separator': '=',
+                'key_prefix': '',
+                'replace_key_whitespace': False,
+                'key_whitespace_replacement': '_'
+            },
+            'converters': {},
+            'condition_type': 'none',
+            'condition_value': ''
+        }
+        url = '/api/system/inputs/%s/extractors' % (input_id,)
+        self.post(url, data)
+
     def main(self):
-        if not self.get_input():
-            node_id = self.get_node_id()
-            if not node_id:
-                raise('Error getting node ID')
-            self.add_input(node_id)
+        input_id = self.setup_input()['id']
+        self.setup_extractor(input_id)
 
 
 def main():
