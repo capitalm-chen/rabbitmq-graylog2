@@ -1,0 +1,1 @@
+{"vhost":"/","source":"amq.topic","destination_type":"e","destination":"log-messages","routing_key":"log.*.*","arguments":{}}
