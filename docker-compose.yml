@@ -39,6 +39,12 @@ services:
       - 9000:9000
       - 12201/udp:12201/udp
       - 1514/udp:1514/udp
+  elastalert:
+    build: ./elastalert
+    depends_on:
+      - elasticsearch
+    volumes:
+      - ./elastalert/conf/:/etc/elastalert:ro
   persistent:
       image: debian:jessie
       volumes:
