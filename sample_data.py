@@ -32,7 +32,7 @@ class Sample(object):
         standard_data = {
             'source': {'id': self.id},
             'type': self.type,
-            'time': self.get_time()
+            '@timestamp': self.get_time()
         }
         standard_data.update(self.data)
         return standard_data
