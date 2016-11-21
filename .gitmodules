@@ -1,0 +1,3 @@
+[submodule "elastalert/wait-for-it"]
+	path = elastalert/wait-for-it
+	url = https://github.com/vishnubob/wait-for-it.git
